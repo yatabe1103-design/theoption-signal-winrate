@@ -608,8 +608,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 初期表示
   const pair = pairEl.value;
-  const ticks = getTicks(pair);
-  priceStatusEl.textContent = `価格データ: ${ticks.length}件（${pair}）`;
+  const ticks = getTicks(pairEl.value);
+  priceStatusEl.textContent = `価格データ: ${ticks.length}件 (${pair})`;
   learnMeta.textContent = `状態: ${guardStatusText()} / 遅延学習あり（母数>=10で反映）`;
 
   // 価格追加
@@ -623,42 +623,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 通貨ペア切替で表示更新
     // 価格取得モード切替（自動ON/OFF）
-  if (priceModeEl.value === "auto") function startAutoPrice() {
-  stopAutoPrice();
-
-  const pair = pairEl.value;
-
-  // FXは自動対象外
-  if (!isCryptoPairStr(pair)) {
-    if (autoStatusEl) autoStatusEl.textContent = "自動取得: FXは未対応（手動にしてください）";
-    if (priceModeEl) priceModeEl.value = "manual";
-    return;
-  }
-
-  if (autoStatusEl) autoStatusEl.textContent = "自動取得: ON（取得中...）";
-
-  autoTimer = setInterval(async () => {
-    try {
-      const p = await fetchCryptoPrice(pairEl.value);
-      if (p != null && isFinite(p) && p > 0) {
-        addPriceTick(pairEl.value, p);
-        if (autoStatusEl) autoStatusEl.textContent = "自動取得: ON";
-      }
-    } catch (e) {
-      if (autoStatusEl) autoStatusEl.textContent = "自動取得: エラー（通信/制限）";
-    }
-  }, 2500); // 2.5秒ごと
-}　;
+// 価格取得モード切替（自動ON/OFF）
+priceModeEl?.addEventListener("change", () => {
+  if (priceModeEl2.value === "auto") startAutoPrice();
   else stopAutoPrice();
 });
-
+// ペア変更時：自動なら取り直し
 // ペア変更時：自動なら取り直し
 pairEl.addEventListener("change", () => {
-  if ((priceModeEl?.value ?? "manual") === "auto") startAutoPrice();
+if ((priceModeEl2?.value ?? "manual") === "auto") startAutoPrice();
+
+  const t = getTicks(pairEl.value);
+  priceStatusEl.textContent = `価格データ: ${t.length}件 (${pairEl.value})`;
 });
-    const t = getTicks(pairEl.value);
-    priceStatusEl.textContent = `価格データ: ${t.length}件（${pairEl.value}）`;
-  });
+});
 
   // 通知
   el("btnPerm").addEventListener("click", async () => {
