@@ -62,7 +62,21 @@ async function ensureNotificationPermission() {
   const p = await Notification.requestPermission();
   return p === "granted";
 }
-function notify(title, body) { if (Notification.permission === "granted") new Notification(title, { body }); }
+async function notify(title, body) {
+  if (!("serviceWorker" in navigator)) return;
+
+  const reg = await navigator.serviceWorker.getRegistration();
+  if (!reg) return;
+
+  await reg.showNotification(title, {
+    body: body,
+    icon: "./icons/icon-192.png",
+    badge: "./icons/icon-192.png",
+    vibrate: [200, 100, 200],
+    tag: "signal-notification",
+    renotify: true
+  });
+}
 
 /** ===== PWA ===== */
 async function registerSW() {
