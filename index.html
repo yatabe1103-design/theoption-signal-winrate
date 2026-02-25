@@ -92,7 +92,12 @@
       <option value="off">OFF</option>
       <option value="on" selected>ON（推奨）</option>
     </select>
-
+<label>価格取得</label>
+<select id="priceMode">
+  <option value="manual" selected>手動（FX向け）</option>
+  <option value="auto">自動（BTC/ETHのみ）</option>
+</select>
+<p class="muted" id="autoStatus">自動取得: OFF</p>
     <label>現在価格（手動入力）</label>
     <div class="row">
       <input id="priceInput" inputmode="decimal" placeholder="例: 150.235 / 68000" />
