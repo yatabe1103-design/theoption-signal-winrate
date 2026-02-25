@@ -611,6 +611,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const ticks = getTicks(pairEl.value);
   priceStatusEl.textContent = `価格データ: ${ticks.length}件 (${pair})`;
   learnMeta.textContent = `状態: ${guardStatusText()} / 遅延学習あり（母数>=10で反映）`;
+  // 初期状態が「自動」なら、ページ起動時に自動取得を開始
+if ((priceModeEl2.value ?? "manual") === "auto") startAutoPrice();
+else stopAutoPrice();
 
   // 価格追加
   btnAddPriceEl.addEventListener("click", () => {
