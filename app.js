@@ -639,7 +639,6 @@ if ((priceModeEl.value ?? "manual") === "auto") startAutoPrice();
   const t = getTicks(pairEl.value);
   priceStatusEl.textContent = `価格データ: ${t.length}件 (${pairEl.value})`;
 });
-});
 
   // 通知
   el("btnPerm").addEventListener("click", async () => {
