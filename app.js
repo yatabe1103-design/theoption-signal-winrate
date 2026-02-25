@@ -22,7 +22,8 @@ const learnMeta = el("learnMeta");
 const confModeEl = el("confMode");
 const confThEl = el("confTh");
 const guardModeEl = el("guardMode");
-
+const priceModeEl = el("priceMode");
+const autoStatusEl = el("autoStatus");
 const priceInputEl = el("priceInput");
 const btnAddPriceEl = el("btnAddPrice");
 const priceStatusEl = el("priceStatus");
@@ -116,6 +117,66 @@ function loadPrices() {
   try { return JSON.parse(raw); } catch { return {}; }
 }
 function savePrices(obj) { localStorage.setItem(PRICE_KEY, JSON.stringify(obj)); }
+let autoTimer = null;
+
+function isCryptoPairStr(pair) {
+  return pair.includes("BTC") || pair.includes("ETH");
+}
+
+function coingeckoIds(pair) {
+  if (pair.includes("BTC")) return "bitcoin";
+  if (pair.includes("ETH")) return "ethereum";
+  return null;
+}
+
+function coingeckoVs(pair) {
+  if (pair.endsWith("/USD")) return "usd";
+  if (pair.endsWith("/JPY")) return "jpy";
+  return null;
+}
+
+async function fetchCryptoPrice(pair) {
+  const id = coingeckoIds(pair);
+  const vs = coingeckoVs(pair);
+  if (!id || !vs) return null;
+
+  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${encodeURIComponent(id)}&vs_currencies=${encodeURIComponent(vs)}`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) return null;
+  const json = await res.json();
+  const v = json?.[id]?.[vs];
+  const p = Number(v);
+  return (isFinite(p) && p > 0) ? p : null;
+}
+
+function startAutoPrice() {
+  stopAutoPrice();
+
+  const pair = pairEl.value;
+
+  if (!isCryptoPairStr(pair)) {
+    if (autoStatusEl) autoStatusEl.textContent = "自動取得: FXは未対応（手動にしてください）";
+    if (priceModeEl) priceModeEl.value = "manual";
+    return;
+  }
+
+  if (autoStatusEl) autoStatusEl.textContent = "自動取得: ON（BTC/ETH）";
+
+  autoTimer = setInterval(async () => {
+    try {
+      const p = await fetchCryptoPrice(pairEl.value);
+      if (p != null) addPriceTick(pairEl.value, p);
+    } catch (e) {
+      if (autoStatusEl) autoStatusEl.textContent = "自動取得: エラー（通信/制限）";
+    }
+  }, 2000);
+}
+
+function stopAutoPrice() {
+  if (autoTimer) clearInterval(autoTimer);
+  autoTimer = null;
+  if (autoStatusEl) autoStatusEl.textContent = "自動取得: OFF";
+}
 function addPriceTick(pair, price) {
   const db = loadPrices();
   if (!db[pair]) db[pair] = [];
