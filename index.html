@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ザオプション専用 シグナル（勝率優先）</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#111111">
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans JP",sans-serif;margin:0;background:#0b0b0f;color:#fff}
+    header{padding:16px;border-bottom:1px solid #222;position:sticky;top:0;background:#0b0b0f}
+    .wrap{padding:16px;max-width:900px;margin:0 auto}
+    .grid{display:grid;gap:12px}
+    @media(min-width:700px){.grid{grid-template-columns:1fr 1fr}}
+    .card{border:1px solid #222;border-radius:14px;padding:14px;background:#11111a}
+    label{display:block;margin:10px 0 6px;color:#cfcfe6;font-size:13px}
+    select,button,input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;background:#0f0f15;color:#fff}
+    button{cursor:pointer}
+    .row{display:flex;gap:10px;align-items:center}
+    .row > *{flex:1}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #333;font-size:12px;color:#cfcfe6;margin-right:6px;margin-top:6px}
+    .big{font-size:34px;font-weight:800;letter-spacing:0.5px}
+    .signal{font-size:22px;font-weight:800}
+    .muted{color:#a7a7c2;font-size:13px;line-height:1.6}
+    .ok{color:#58ffa6}
+    .warn{color:#ffd36e}
+    .bad{color:#ff6b6b}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="row" style="align-items:flex-end;gap:12px">
+      <div>
+        <div class="pill">Android / Chrome 推奨</div>
+        <h1 style="margin:10px 0 0;font-size:18px">ザオプション専用 シグナル（勝率優先 / A案）</h1>
+      </div>
+      <button id="btnInstall" style="max-width:220px;display:none">ホーム画面に追加</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap grid">
+  <div class="card">
+    <h2 style="margin:0 0 10px;font-size:16px">設定</h2>
+
+    <label>通貨ペア</label>
+    <select id="pair">
+      <option>USD/JPY</option><option>EUR/USD</option><option>EUR/JPY</option><option>AUD/JPY</option>
+      <option>GBP/JPY</option><option>AUD/USD</option><option>NZD/JPY</option>
+      <option>BTC/USD</option><option>BTC/JPY</option><option>ETH/JPY</option><option>ETH/USD</option>
+    </select>
+
+    <label>判定時間</label>
+    <select id="tf">
+      <option value="15">15秒</option>
+      <option value="30">30秒</option>
+      <option value="60" selected>1分</option>
+      <option value="180">3分</option>
+      <option value="300">5分</option>
+    </select>
+
+    <label>通知（ページを開いている間）</label>
+    <div class="row">
+      <button id="btnPerm">通知を許可</button>
+      <button id="btnTest">テスト通知</button>
+    </div>
+
+    <label>エントリータイミング（開始の何秒前）</label>
+    <select id="entryLead">
+      <option value="0">開始ぴったり</option>
+      <option value="1" selected>1秒前</option>
+      <option value="2">2秒前</option>
+      <option value="3">3秒前</option>
+    </select>
+
+    <label>コンフルエンス（根拠の重なり）</label>
+    <select id="confMode">
+      <option value="off">OFF</option>
+      <option value="on" selected>ON（推奨）</option>
+    </select>
+
+    <label>コンフルエンス閾値（スコア）</label>
+    <select id="confTh">
+      <option value="1">1（ゆるい）</option>
+      <option value="2" selected>2（推奨）</option>
+      <option value="3">3（厳しめ）</option>
+    </select>
+
+    <label>直近成績ガード</label>
+    <select id="guardMode">
+      <option value="off">OFF</option>
+      <option value="on" selected>ON（推奨）</option>
+    </select>
+
+    <label>現在価格（手動入力）</label>
+    <div class="row">
+      <input id="priceInput" inputmode="decimal" placeholder="例: 150.235 / 68000" />
+      <button id="btnAddPrice">追加</button>
+    </div>
+    <p class="muted" id="priceStatus">価格データ: 0件</p>
+    <div class="pill">15/30秒は 2〜5秒に1回</div>
+    <div class="pill">1分は 5〜10秒に1回</div>
+    <div class="pill">3/5分は 10〜20秒に1回</div>
+
+    <label>開始/停止</label>
+    <div class="row">
+      <button id="btnStart">開始</button>
+      <button id="btnStop">停止</button>
+    </div>
+
+    <p class="muted">
+      ※A案の通知は「ページを開いている間」のみ安定します。<br>
+      ※勝率80%は「ベイズ補正＋母数条件＋コンフル」で厳選します。
+    </p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 10px;font-size:16px">シグナル</h2>
+
+    <div class="pill" id="statusPill">待機中</div>
+
+    <div style="margin-top:14px">
+      <div class="muted">次の取引開始まで</div>
+      <div class="big" id="countdown">--</div>
+    </div>
+
+    <div style="margin-top:14px">
+      <div class="muted">エントリー推奨</div>
+      <div class="big" id="entryCountdown">--</div>
+      <div class="muted" id="entryPlan">条件未成立</div>
+    </div>
+
+    <div style="margin-top:14px">
+      <div class="muted">現在の判定（High/Low）</div>
+      <div class="signal" id="signalText">--</div>
+      <div class="muted" id="signalMeta" style="margin-top:8px">確信度: -- / 根拠: --</div>
+    </div>
+
+    <div style="margin-top:16px;border-top:1px solid #222;padding-top:12px">
+      <div class="muted">結果入力（案①：手動）</div>
+      <div class="row">
+        <button id="btnLearn">win/loseを入力</button>
+        <button id="btnReset">学習リセット</button>
+      </div>
+      <div class="muted" id="learnMeta" style="margin-top:8px">状態: 未学習</div>
+    </div>
+  </div>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
