@@ -622,9 +622,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // 通貨ペア切替で表示更新
-  pairEl.addEventListener("change", () => {
     // 価格取得モード切替（自動ON/OFF）
-priceModeEl?.addEventListener("change", () => {
   if (priceModeEl.value === "auto") function startAutoPrice() {
   stopAutoPrice();
 
