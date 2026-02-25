@@ -612,7 +612,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   priceStatusEl.textContent = `価格データ: ${ticks.length}件 (${pair})`;
   learnMeta.textContent = `状態: ${guardStatusText()} / 遅延学習あり（母数>=10で反映）`;
   // 初期状態が「自動」なら、ページ起動時に自動取得を開始
-if ((priceModeEl2.value ?? "manual") === "auto") startAutoPrice();
+if ((priceModeEl.value ?? "manual") === "auto") startAutoPrice();
 else stopAutoPrice();
 
   // 価格追加
@@ -627,14 +627,14 @@ else stopAutoPrice();
   // 通貨ペア切替で表示更新
     // 価格取得モード切替（自動ON/OFF）
 // 価格取得モード切替（自動ON/OFF）
-priceModeEl?.addEventListener("change", () => {
-  if (priceModeEl2.value === "auto") startAutoPrice();
+priceModeEl.addEventListener("change", () => {
+  if (priceModeEl.value === "auto") startAutoPrice();
   else stopAutoPrice();
 });
 // ペア変更時：自動なら取り直し
 // ペア変更時：自動なら取り直し
 pairEl.addEventListener("change", () => {
-if ((priceModeEl2?.value ?? "manual") === "auto") startAutoPrice();
+if ((priceModeEl.value ?? "manual") === "auto") startAutoPrice();
 
   const t = getTicks(pairEl.value);
   priceStatusEl.textContent = `価格データ: ${t.length}件 (${pairEl.value})`;
