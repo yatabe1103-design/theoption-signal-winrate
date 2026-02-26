@@ -172,7 +172,6 @@ if (autoStatusEl)
     "自動取得: エラー " + (e?.message || e);
     }
   }, 15000);
-}5000
 
 function stopAutoPrice() {
   if (autoTimer) clearInterval(autoTimer);
