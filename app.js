@@ -603,7 +603,7 @@ function resetAllLearn() {
 }
 
 /** ===== 起動 ===== */
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
   // await registerSW();
   setupInstallButton();
 
@@ -635,6 +635,7 @@ priceModeEl.addEventListener("change", () => {
 // ペア変更時：自動なら取り直し
 pairEl.addEventListener("change", () => {
 if ((priceModeEl.value ?? "manual") === "auto") startAutoPrice();
+else stopAutoPrice();
 
   const t = getTicks(pairEl.value);
   priceStatusEl.textContent = `価格データ: ${t.length}件 (${pairEl.value})`;
