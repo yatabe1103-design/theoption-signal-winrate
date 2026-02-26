@@ -171,8 +171,8 @@ if (autoStatusEl)
   autoStatusEl.textContent =
     "自動取得: エラー " + (e?.message || e);
     }
-  }, 10000);
-}
+  }, 15000);
+}5000
 
 function stopAutoPrice() {
   if (autoTimer) clearInterval(autoTimer);
