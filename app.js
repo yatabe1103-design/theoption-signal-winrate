@@ -604,7 +604,7 @@ function resetAllLearn() {
 
 /** ===== 起動 ===== */
 document.addEventListener("DOMContentLoaded", async () => {
-  await registerSW();
+  // await registerSW();
   setupInstallButton();
 
   // 初期表示
