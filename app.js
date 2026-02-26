@@ -142,7 +142,7 @@ async function fetchCryptoPrice(pair) {
 
   const url = `https://api.coingecko.com/api/v3/simple/price?ids=${encodeURIComponent(id)}&vs_currencies=${encodeURIComponent(vs)}`;
   const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) return null;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();
   const v = json?.[id]?.[vs];
   const p = Number(v);
@@ -161,7 +161,14 @@ function startAutoPrice() {
   }
 
   if (autoStatusEl) autoStatusEl.textContent = "自動取得: ON（BTC/ETH）";
-
+(async () => {
+  try {
+    const p = await fetchCryptoPrice(pairEl.value);
+    if (p != null) addPriceTick(pairEl.value, p);
+  } catch (e) {
+    if (autoStatusEl) autoStatusEl.textContent = "自動取得: エラー — " + (e?.message || e);
+  }
+})();
   autoTimer = setInterval(async () => {
     try {
       const p = await fetchCryptoPrice(pairEl.value);
@@ -604,7 +611,7 @@ function resetAllLearn() {
 
 /** ===== 起動 ===== */
 document.addEventListener("DOMContentLoaded", () => {
-  // await registerSW();
+  await registerSW();
   setupInstallButton();
 
   // 初期表示
