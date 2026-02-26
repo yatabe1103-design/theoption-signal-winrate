@@ -176,7 +176,7 @@ if (autoStatusEl)
 function stopAutoPrice() {
   if (autoTimer) clearInterval(autoTimer);
   autoTimer = null;
-  if (autoStatusE10000l) autoStatusEl.textContent = "自動取得: OFF";
+  if (autoStatusE1) autoStatusEl.textContent = "自動取得: OFF";
 }
 function addPriceTick(pair, price) {
   const db = loadPrices();
