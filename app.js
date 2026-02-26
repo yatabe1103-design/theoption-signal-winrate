@@ -615,7 +615,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 初期状態が「自動」なら、ページ起動時に自動取得を開始
 if ((priceModeEl.value ?? "manual") === "auto") startAutoPrice();
 else stopAutoPrice();
-
   // 価格追加
   btnAddPriceEl.addEventListener("click", () => {
     const v = (priceInputEl.value || "").replace(/,/g, "").trim();
