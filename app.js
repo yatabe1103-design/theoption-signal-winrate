@@ -167,15 +167,17 @@ function startAutoPrice() {
       const p = await fetchCryptoPrice(pairEl.value);
       if (p != null) addPriceTick(pairEl.value, p);
     } catch (e) {
-      if (autoStatusEl) autoStatusEl.textContent = "自動取得: エラー（通信/制限）";
+if (autoStatusEl)
+  autoStatusEl.textContent =
+    "自動取得: エラー " + (e?.message || e);
     }
-  }, 2000);
+  }, 10000);
 }
 
 function stopAutoPrice() {
   if (autoTimer) clearInterval(autoTimer);
   autoTimer = null;
-  if (autoStatusEl) autoStatusEl.textContent = "自動取得: OFF";
+  if (autoStatusE10000l) autoStatusEl.textContent = "自動取得: OFF";
 }
 function addPriceTick(pair, price) {
   const db = loadPrices();
