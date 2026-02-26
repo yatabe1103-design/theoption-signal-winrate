@@ -610,7 +610,8 @@ function resetAllLearn() {
 }
 
 /** ===== 起動 ===== */
-document.addEventListener("DOMContentLoaded", () => {
+
+document.addEventListener("DOMContentLoaded", async () => {
   await registerSW();
   setupInstallButton();
 
